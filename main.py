@@ -3,6 +3,21 @@ from langchain import hub
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain_experimental.tools import PythonREPLTool
+#from langchain.agents import create_csv_agent
+from langchain_experimental.agents.agent_toolkits import create_csv_agent
+
+
+
+def csv_agent():
+    csv_agent = create_csv_agent(
+        llm=ChatOpenAI(temperature=0),
+        path="episode_info.csv",
+        verbose=True,
+        allow_dangerous_code=True
+    )
+    csv_agent.invoke(
+        input={"input": "HOW MANY COLUMNS ARE THERE IN THE CSV FILE?"}
+        )
 
 def main():
     # Your main function code here
@@ -26,8 +41,9 @@ def main():
     base_prompt= hub.pull("langchain-ai/react-agent-template")
     prompt = base_prompt.partial(instructions=instructions)
     tools = [PythonREPLTool()]
+    llm = ChatOpenAI(temperature=0)
     agent = create_react_agent(
-        llm=ChatOpenAI(temperature=0),
+        llm=llm,
         tools=tools,
         prompt=prompt
                 )
@@ -41,3 +57,4 @@ def main():
 if __name__ == "__main__":
     load_dotenv()
     main()
+    csv_agent()
